@@ -1,8 +1,33 @@
-<DOCTYPEhtml> 
+<!DOCTYPEhtml> 
 <html> 
 <title>TabTracker-admin</title>
 <head> </head> 
 <body>
+    <table style="border:1px solid black;">
+        <tr> 
+            <th> name </th> 
+            <th> balance </th>
+            
+
+
+
+
+
+            
+        </tr> 
+
+
+
+</table>
+
+
+
+
+
+
+
+
+
     <form> 
 
         Name:  
@@ -15,49 +40,33 @@
         <button id="PayedDown" type="button"> payed </button> 
         <button id="Clear" type="button"> reset </button>
 
-
         <div id="ledgerView"></div>
     
     </form> 
 
     <script> 
-//* santax = type/ cost
-        menu = {
+//* santax = type/ cost               
+       var Inventory = {
              tapBeer: {
                 price: 5.25, 
                 brands: [
                     steemwhistle,
-                    millstreetOrganic, 
+                    millstreetOrganic,
                     millstreetTankHouse,
                 ]
              },
             bottledBeer: {
-                price:4.5,
-                brands:[
-                    canadian,
-                    budwiser,
-                    molsonExport,            
+              price:4.5,
+            brands:[
+                canadian,
+                budwiser,
+                molsonExport,            
                 ]
             },       
         };
-function balance { 
-    
-}
-        person= { 
-          { 
 
-         }
-            payDown: {
-                +5
-                +10 
-                +15
-            }
-            payUp: {
-
-            }
-
-
-        }
+//
+//
 
 
 
@@ -96,6 +105,10 @@ function balance {
             updateLedgerView();
 
         }
+//
+
+
+
 
         function pay() {
             
