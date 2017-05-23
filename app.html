@@ -1,14 +1,42 @@
 <!DOCTYPEhtml> 
 <html> 
 <title>TabTracker-admin</title>
-<head> </head>
-<body>
+<head> 
+    <style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
 
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+    
+     </head>
+<body>
+<!--objectives:
+ grab output values and sort into table 
+
+
+
+-->
       Name: <input id="nameInput" type="text" name="name"><br>
-      $: <input id="priceInput" type="number" name="priceOwed"><br>
+      $:    <input id="priceInput" type="number" name="priceOwed" min="0"><br>
+
       Notes: <input id="notesInput" type="text" name="notes"><br>
-      <button id="addNew" type="button"> Add New Entry </button>
-      <button id="PayedDown" type="button"> payed </button>
+   
+   
+   
+      <button id="addNew" type="button"> Add To Tab </button>
+      <button id="PayedDown" type="button"> Pay </button>
       <button id="Clear" type="button"> reset </button>
       <div id="ledgerView"></div>
 
