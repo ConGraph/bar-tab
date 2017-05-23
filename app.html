@@ -1,125 +1,123 @@
-<DOCTYPEhtml> 
-<html> 
+<DOCTYPEhtml>
+<html>
 <title>TabTracker-admin</title>
-<head> </head> 
+<head> </head>
 <body>
-    <form> 
 
-        Name:  
-        <input id="nameInput" type="text" name="name"><br>
-        $:         
-        <input id="priceInput" type="number" name="priceOwed">
-        <br>
-        <button id="addNew" type="button"> Add New Entry </button>
+      Name: <input id="nameInput" type="text" name="name"><br>
+      $: <input id="priceInput" type="number" name="priceOwed"><br>
+      Notes: <input id="notesInput" type="text" name="notes"><br>
+      <button id="addNew" type="button"> Add New Entry </button>
+      <button id="PayedDown" type="button"> payed </button>
+      <button id="Clear" type="button"> reset </button>
+      <div id="ledgerView"></div>
 
-        <button id="PayedDown" type="button"> payed </button> 
-        <button id="Clear" type="button"> reset </button>
-
-
-        <div id="ledgerView"></div>
-    
-    </form> 
-
-    <script> 
-//* santax = type/ cost
-        menu = {
-             tapBeer: {
-                price: 5.25, 
-                brands: [
-                    steemwhistle,
-                    millstreetOrganic, 
-                    millstreetTankHouse,
-                ]
-             },
-            bottledBeer: {
-                price:4.5,
-                brands:[
-                    canadian,
-                    budwiser,
-                    molsonExport,            
-                ]
-            },       
-        };
-function balance { 
-    
-}
-        person= { 
-          { 
-
-         }
-            payDown: {
-                +5
-                +10 
-                +15
-            }
-            payUp: {
-
-            }
-
-
-        }
-
-
+    <script>
 
         ledger = [];
         nameInput = document.getElementById("nameInput");
         priceInput = document.getElementById("priceInput");
+        notesInput = document.getElementById("notesInput");
         buttonCollect = document.getElementById("addNew");
         buttonPayed = document.getElementById("PayedDown");
         buttonReset = document.getElementById("Clear");
         ledgerView = document.getElementById("ledgerView");
-        
-
 
         buttonCollect.onclick = collect;
         buttonPayed.onclick = pay;
-        buttonReset.onclick = clear; 
+        buttonReset.onclick = clear;
+
         function collect() {
-            
+
             // collect info for new entry
-            var newEntry = grabInputData();
-            
-            // look for an existing entry with that person
-            var found = findPerson(newEntry.person);
-           
-            // if we find an existing entry with that person
-            if(typeof found != 'undefined'){
-                // add amounts together, replace old amount
-                found.amount = found.amount + newEntry.amount;
-                // and thats it, no new entry
-            } else {
-                // if we dont have an entry with that person, push
-                ledger.push(newEntry);
-            }
-            
+            var entry = grabInputData();
+
+            // look for an existing entry with that name, or create a new one
+            var account = getAccount(entry.name) || openAccount(entry.name);
+
+            // add to history
+            account.history.push({
+              type: 'TAB',
+              amount: entry.amount,
+              notes: entry.notes,
+              date: new Date(),
+            });
+
+            // add to balance
+            account.balance = account.balance + entry.amount;
+
             //update ledger view
             updateLedgerView();
 
         }
 
         function pay() {
-            
-            var newEntry = grabInputData(); 
-            var found = findPerson(newEntry.person);
 
-            if(typeof found == 'undefined'){
-              // we dont have this person...
+            var entry = grabInputData();
+            var account = getAccount(entry.name);
+
+            if(typeof account == 'undefined'){
+                // we dont have this person... (do nothing)
             } else {
-                // we found a record
-                // variable `found` is the record
-                found.amount = found.amount - newEntry.amount;
+              // add to history
+              account.history.push({
+                type: 'PAY',
+                amount: entry.amount,
+                notes: entry.notes,
+                date: new Date(),
+              });
+
+              // add to balance
+              account.balance = account.balance - entry.amount;
             }
-            
+
             //update ledger view print out
             updateLedgerView();
 
         }
 
-        function clear() { 
-            ledger = []; 
-            updateLedgerView(); 
+        function clear() {
+            ledger = [];
+            updateLedgerView();
         }
 
+        function getAccount(personName) {
+            return ledger.find(function(existingEntry){
+                if(existingEntry.name == personName) return true;
+            });
+        }
+
+        function grabInputData(){
+            // grab user data
+            var inputData = {
+                name: nameInput.value,
+                amount: parseInt(priceInput.value),
+                notes: notesInput.value,
+            };
+            // clear inputs
+            nameInput.value = "";
+            priceInput.value = "";
+            notesInput.value = "";
+            // return data that we grabbed
+            return inputData;
+        }
+
+        function openAccount(personName){
+          var newAccount = {
+            name: personName,
+            history: [],
+            balance: 0,
+          }
+          ledger.push(newAccount);
+          return newAccount;
+        }
+
+        function dateToYMD(date) {
+          var d = date.getDate();
+          var m = date.getMonth() + 1;
+          var y = date.getFullYear();
+          return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
+        }
 
         function updateLedgerView(){
 
@@ -127,37 +125,33 @@ function balance {
 
             var table = document.createElement("table");
             for(var i = 0; i < ledger.length; i++){
-                var entry = ledger[i];
+                var account = ledger[i];
                 var row = table.insertRow();
                 var nameCell = row.insertCell();
-                var amountCell = row.insertCell();
-                nameCell.innerHTML = entry.person;
-                amountCell.innerHTML = entry.amount;
+                var balanceCell = row.insertCell();
+                var historyCell = row.insertCell();
+                nameCell.innerHTML = account.name;
+                balanceCell.innerHTML = account.balance;
+
+                var historyTable = document.createElement('table');
+                for(var j = 0; j < account.history.length; j++){
+                  var entry = account.history[j];
+                  var row = historyTable.insertRow();
+                  var dateCell = row.insertCell();
+                  var typeCell = row.insertCell();
+                  var amountCell = row.insertCell();
+                  var notesCell = row.insertCell();
+                  dateCell.innerHTML = dateToYMD(entry.date);
+                  typeCell.innerHTML = entry.type;
+                  amountCell.innerHTML = entry.amount;
+                  notesCell.innerHTML = entry.notes;
+                }
+                historyCell.appendChild(historyTable);
             }
 
             ledgerView.appendChild(table);
         }
 
-        function findPerson(personName) {  
-            return ledger.find(function(existingEntry){
-                if(existingEntry.person == personName) return true;
-            });
-        }
-
-        function grabInputData(){
-            // grab user data
-            var inputData = { 
-                person: nameInput.value,
-                amount: parseInt(priceInput.value) 
-            };
-            // clear inputs
-            nameInput.value = "";
-            priceInput.value = "";
-            // return data that we grabbed
-            return inputData;
-        }
-
-
-    </script> 
-</body> 
+    </script>
+</body>
 </html>
